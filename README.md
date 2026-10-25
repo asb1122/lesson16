@@ -16,6 +16,8 @@ WorkingDirectory=/var/www/app16/nodejs_app
 ExecStart=/usr/bin/node server.js
 Restart=on-failure
 RestartSec=5
+Environment=NODE_ENV=production
+Environment=PORT=3000
 
 [Install]
 WantedBy=multi-user.target
