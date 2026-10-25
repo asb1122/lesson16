@@ -211,7 +211,7 @@ server {
   ssl_session_cache    shared:SSL:10m;
   ssl_session_timeout 10m;
 
-  access_log          /var/log/nginx/app16.access.log;
+  access_log          /var/log/nginx/app16.access.log upstream_log;
   error_log           /var/log/nginx/app16.error.log;
 
   location / {
@@ -223,6 +223,21 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
   }
 }
+
+
+````
+
+работа балансинга в логах:
+
+````
+artsiom@ubundu26:/var/www/app16/nodejs_app$ for i in {1..6}; do curl -k -s -o /dev/null https://192.168.2.105/; done
+sudo tail -n 6 /var/log/nginx/app16.access.log
+192.168.2.105 - - [26/Oct/2026:01:52:04 +0300] "GET / HTTP/1.1" 200 703 "-" "curl/8.18.0" to: 127.0.0.1:3000
+192.168.2.105 - - [26/Oct/2026:01:52:04 +0300] "GET / HTTP/1.1" 200 703 "-" "curl/8.18.0" to: 127.0.0.1:3001
+192.168.2.105 - - [26/Oct/2026:01:52:04 +0300] "GET / HTTP/1.1" 200 703 "-" "curl/8.18.0" to: 127.0.0.1:3000
+192.168.2.105 - - [26/Oct/2026:01:52:04 +0300] "GET / HTTP/1.1" 200 703 "-" "curl/8.18.0" to: 127.0.0.1:3001
+192.168.2.105 - - [26/Oct/2026:01:52:04 +0300] "GET / HTTP/1.1" 200 703 "-" "curl/8.18.0" to: 127.0.0.1:3000
+192.168.2.105 - - [26/Oct/2026:01:52:04 +0300] "GET / HTTP/1.1" 200 703 "-" "curl/8.18.0" to: 127.0.0.1:3001
 
 
 ````
