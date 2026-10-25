@@ -87,25 +87,6 @@ server {
     proxy_set_header   X-Forwarded-Proto $scheme;
     proxy_read_timeout 60s;
   }
-  
-  location /api/notes {
-    default_type application/json;
-    add_header X-Demo-Location "/api/notes";
-    return 200 ' {"status": "ok"}';
-  }
-  
-  location /notes { 
-    default_type application/json;
-    add_header X-Demo-Location "/notes";
-    return 200 ' {"status": "ok"}';
-  }
-
-  location /add { 
-    default_type application/json;
-    add_header X-Demo-Location "/add";
-    return 200 ' {"status": "ok"}';
-  }
-
 }
 
 ````
@@ -170,5 +151,77 @@ artsiom@ubundu26:/etc/nginx/sites-available$ curl -k https://localhost/api/notes
 ````
 
 
+<img width="967" height="703" alt="Снимок экрана 2026-10-26 в 00 43 49" src="https://github.com/user-attachments/assets/56755ad1-5eff-4c39-9db1-62b575be82eb" />
+
+
+<img width="617" height="716" alt="Снимок экрана 2026-10-26 в 00 28 29" src="https://github.com/user-attachments/assets/10e6bd36-45e2-46ce-8ed8-8b0e6fbbdb4e" />
+
+
+
 3. Поднять второй экземпляр приложения из п1 на другом порту
 
+сервис для порта 3000
+
+````
+
+[Unit]
+Description=Nodejs app port 3001
+After=network.target
+
+[Service]
+Type=simple
+User=webadmin
+Group=webgroup
+WorkingDirectory=/var/www/app16/nodejs_app
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PORT=3001
+
+[Install]
+WantedBy=multi-user.target
+````
+
+
+ngix конфиг для балансера
+
+````
+upstream backend {
+  server 192.168.2.105:3000;
+  server 192.168.2.105:3001;
+}
+
+server {
+  listen 80;
+  server_name 192.168.2.105;
+
+  return 301 https://$host$request_uri;
+}
+
+server {
+  listen 443 ssl;
+  server_name 192.168.2.105;
+
+  ssl_certificate     /etc/nginx/ssl/diary.crt;
+  ssl_certificate_key /etc/nginx/ssl/diary.key;
+
+  ssl_protocols       TLSv1.2 TLSv1.3;
+  ssl_ciphers         HIGH:!aNULL:!MD5;
+  ssl_session_cache    shared:SSL:10m;
+  ssl_session_timeout 10m;
+
+  access_log          /var/log/nginx/app16.access.log;
+  error_log           /var/log/nginx/app16.error.log;
+
+  location / {
+    proxy_pass http://backend;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
+
+````
