@@ -241,3 +241,6 @@ sudo tail -n 6 /var/log/nginx/app16.access.log
 
 
 ````
+
+
+<img width="915" height="424" alt="Снимок экрана 2026-10-26 в 12 56 32" src="https://github.com/user-attachments/assets/531946fb-d704-4876-9704-16c86df1bc10" />
