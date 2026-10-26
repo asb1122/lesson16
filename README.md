@@ -160,7 +160,7 @@ artsiom@ubundu26:/etc/nginx/sites-available$ curl -k https://localhost/api/notes
 
 3. Поднять второй экземпляр приложения из п1 на другом порту
 
-сервис для порта 3000
+сервис для порта 3001
 
 ````
 
